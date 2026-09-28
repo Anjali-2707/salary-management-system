@@ -89,8 +89,34 @@ const getEmployeeById = async (id, { signal } = {}) => {
   return response.json();
 };
 
+const createEmployee = async (employee) => {
+  const response = await fetch("/api/employees", {
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify(employee),
+  });
+
+  if (!response.ok) {
+    const errorData = await response
+      .json()
+      .catch(() => null);
+
+    throw new Error(
+      errorData?.error ||
+        "Failed to create employee"
+    );
+  }
+
+  return response.json();
+};
+
 export {
   getEmployees,
   getEmployeeFilterOptions,
-  getEmployeeById
+  getEmployeeById,
+  createEmployee
 };

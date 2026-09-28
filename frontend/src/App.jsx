@@ -7,6 +7,7 @@ import AppLayout from "./components/AppLayout";
 import DashboardPage from "./pages/DashboardPage";
 import EmployeesPage from "./pages/EmployeesPage";
 import EmployeeDetailsPage from "./pages/EmployeeDetailsPage";
+import AddEmployeePage from "./pages/AddEmployeePage";
 
 function App() {
   return (
@@ -25,6 +26,11 @@ function App() {
         <Route
           path="/employees/:id"
           element={<EmployeeDetailsPage />}
+        />
+
+        <Route
+          path="/employees/new"
+          element={<AddEmployeePage />}
         />
       </Route>
     </Routes>

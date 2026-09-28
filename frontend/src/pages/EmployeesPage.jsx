@@ -144,6 +144,9 @@ function EmployeesPage() {
   return (
     <div>
       <h1>Employees</h1>
+      <Link to="/employees/new">
+        Add Employee
+        </Link>
 
       <form onSubmit={handleSearch}>
         <input
