@@ -57,22 +57,51 @@ const createEmployee = (req, res) => {
     });
   }
 
-  try {
-    const employee = createNewEmployee(validation.value);
+  const employee = createNewEmployee(validation.value);
 
-    return res.status(201).json(employee);
-  } catch (error) {
-    if (
-      error.code === "SQLITE_CONSTRAINT_UNIQUE"
-    ) {
-      return res.status(409).json({
-        error: "Employee ID or email already exists",
-      });
-    }
-
-    throw error;
-  }
+  return res.status(201).json(employee);
 };
+
+// const updateEmployee = (req, res) => {
+//   const id = Number(req.params.id);
+
+//   if (!Number.isInteger(id) || id < 1) {
+//     return res.status(400).json({
+//       error: "Employee id must be a positive integer",
+//     });
+//   }
+
+//   const validation = validateEmployee(req.body);
+
+//   if (validation.error) {
+//     return res.status(400).json({
+//       error: validation.error,
+//     });
+//   }
+
+//   try {
+//     const employee = updateEmployeeDetails(
+//       id,
+//       validation.value
+//     );
+
+//     if (!employee) {
+//       return res.status(404).json({
+//         error: "Employee not found",
+//       });
+//     }
+
+//     return res.status(200).json(employee);
+//   } catch (error) {
+//     if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
+//       return res.status(409).json({
+//         error: "Employee ID or email already exists",
+//       });
+//     }
+
+//     throw error;
+//   }
+// };
 
 const updateEmployee = (req, res) => {
   const id = Number(req.params.id);
@@ -91,28 +120,18 @@ const updateEmployee = (req, res) => {
     });
   }
 
-  try {
-    const employee = updateEmployeeDetails(
-      id,
-      validation.value
-    );
+  const employee = updateEmployeeDetails(
+    id,
+    validation.value
+  );
 
-    if (!employee) {
-      return res.status(404).json({
-        error: "Employee not found",
-      });
-    }
-
-    return res.status(200).json(employee);
-  } catch (error) {
-    if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
-      return res.status(409).json({
-        error: "Employee ID or email already exists",
-      });
-    }
-
-    throw error;
+  if (!employee) {
+    return res.status(404).json({
+      error: "Employee not found",
+    });
   }
+
+  return res.status(200).json(employee);
 };
 
 const deleteEmployee = (req, res) => {
