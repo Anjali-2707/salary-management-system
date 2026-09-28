@@ -133,7 +133,115 @@ const getEmployeeCount = ({
   return result.total;
 };
 
+const getEmployeeById = (id) => {
+  const employee = db
+    .prepare(`
+      SELECT
+        id,
+        employee_id,
+        first_name,
+        last_name,
+        email,
+        department,
+        designation,
+        country,
+        currency,
+        annual_salary,
+        joining_date,
+        created_at,
+        updated_at
+      FROM employees
+      WHERE id = ?
+    `)
+    .get(id);
+
+  return employee;
+};
+
+const createEmployee = (employee) => {
+  const result = db
+    .prepare(`
+      INSERT INTO employees (
+        employee_id,
+        first_name,
+        last_name,
+        email,
+        department,
+        designation,
+        country,
+        currency,
+        annual_salary,
+        joining_date
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `)
+    .run(
+      employee.employeeId,
+      employee.firstName,
+      employee.lastName,
+      employee.email,
+      employee.department,
+      employee.designation,
+      employee.country,
+      employee.currency,
+      employee.annualSalary,
+      employee.joiningDate
+    );
+
+  return Number(result.lastInsertRowid);
+};
+
+const updateEmployee = (id, employee) => {
+  const result = db
+    .prepare(`
+      UPDATE employees
+      SET
+        employee_id = ?,
+        first_name = ?,
+        last_name = ?,
+        email = ?,
+        department = ?,
+        designation = ?,
+        country = ?,
+        currency = ?,
+        annual_salary = ?,
+        joining_date = ?,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `)
+    .run(
+      employee.employeeId,
+      employee.firstName,
+      employee.lastName,
+      employee.email,
+      employee.department,
+      employee.designation,
+      employee.country,
+      employee.currency,
+      employee.annualSalary,
+      employee.joiningDate,
+      id
+    );
+
+  return result.changes;
+};
+
+const deleteEmployee = (id) => {
+  const result = db
+    .prepare(`
+      DELETE FROM employees
+      WHERE id = ?
+    `)
+    .run(id);
+
+  return result.changes;
+};
+
 module.exports = {
   getEmployees,
   getEmployeeCount,
+  getEmployeeById,
+  createEmployee,
+  updateEmployee,
+  deleteEmployee
 };

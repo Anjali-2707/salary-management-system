@@ -1,7 +1,45 @@
 const {
   getEmployees,
   getEmployeeCount,
+  getEmployeeById,
+  createEmployee,
+  updateEmployee,
+  deleteEmployee
 } = require("../repositories/employee.repository");
+
+const getEmployeeDetails = (id) => {
+  return getEmployeeById(id);
+};
+
+const createNewEmployee = (employee) => {
+  const employeeId = createEmployee(employee);
+
+  return getEmployeeById(employeeId);
+};
+
+const updateEmployeeDetails = (id, employee) => {
+  const existingEmployee = getEmployeeById(id);
+
+  if (!existingEmployee) {
+    return null;
+  }
+
+  updateEmployee(id, employee);
+
+  return getEmployeeById(id);
+};
+
+const deleteEmployeeById = (id) => {
+  const existingEmployee = getEmployeeById(id);
+
+  if (!existingEmployee) {
+    return false;
+  }
+
+  deleteEmployee(id);
+
+  return true;
+};
 
 const getEmployeeList = ({
   page,
@@ -45,4 +83,8 @@ const getEmployeeList = ({
 
 module.exports = {
   getEmployeeList,
+  getEmployeeDetails,
+  createNewEmployee,
+  updateEmployeeDetails,
+  deleteEmployeeById
 };
