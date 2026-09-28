@@ -4,7 +4,8 @@ const {
   getEmployeeById,
   createEmployee,
   updateEmployee,
-  deleteEmployee
+  deleteEmployee,
+  getEmployeeFilterOptions
 } = require("../repositories/employee.repository");
 
 const getEmployeeDetails = (id) => {
@@ -81,10 +82,25 @@ const getEmployeeList = ({
   };
 };
 
+const getFilterOptions = () => {
+  const options = getEmployeeFilterOptions();
+
+  return {
+    departments: options.departments.map(
+      (item) => item.department
+    ),
+
+    countries: options.countries.map(
+      (item) => item.country
+    ),
+  };
+};
+
 module.exports = {
   getEmployeeList,
   getEmployeeDetails,
   createNewEmployee,
   updateEmployeeDetails,
-  deleteEmployeeById
+  deleteEmployeeById,
+  getFilterOptions
 };

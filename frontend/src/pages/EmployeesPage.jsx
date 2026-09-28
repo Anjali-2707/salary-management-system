@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import {
   getEmployees,
+  getEmployeeFilterOptions,
 } from "../services/employeeService";
 
 function EmployeesPage() {
@@ -12,6 +13,14 @@ function EmployeesPage() {
 
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
+
+  const [department, setDepartment] = useState("");
+    const [country, setCountry] = useState("");
+
+    const [filterOptions, setFilterOptions] = useState({
+    departments: [],
+    countries: [],
+    });
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -27,10 +36,12 @@ function EmployeesPage() {
         setError("");
 
         const data = await getEmployees({
-          page,
-          limit,
-          search,
-          signal: controller.signal,
+            page,
+            limit,
+            search,
+            department,
+            country,
+            signal: controller.signal,
         });
 
         setEmployees(data.employees);
@@ -49,7 +60,32 @@ function EmployeesPage() {
     return () => {
       controller.abort();
     };
-  }, [page, search]);
+  }, [page, search, department, country]);
+
+  useEffect(() => {
+  const controller = new AbortController();
+
+  const loadFilterOptions = async () => {
+    try {
+      const data =
+        await getEmployeeFilterOptions({
+          signal: controller.signal,
+        });
+
+      setFilterOptions(data);
+    } catch (error) {
+      if (error.name !== "AbortError") {
+        setError(error.message);
+      }
+    }
+  };
+
+  loadFilterOptions();
+
+  return () => {
+    controller.abort();
+  };
+}, []);
 
   const handleSearch = (event) => {
     event.preventDefault();
@@ -58,11 +94,13 @@ function EmployeesPage() {
     setSearch(searchInput.trim());
   };
 
-  const handleClearSearch = () => {
+  const handleClearFilters = () => {
     setSearchInput("");
     setSearch("");
+    setDepartment("");
+    setCountry("");
     setPage(1);
-  };
+    };
 
   const handlePreviousPage = () => {
     setPage((currentPage) => currentPage - 1);
@@ -94,15 +132,60 @@ function EmployeesPage() {
           Search
         </button>
 
-        {search && (
+        {(search || department || country) && (
           <button
             type="button"
-            onClick={handleClearSearch}
+            onClick={handleClearFilters}
           >
             Clear
           </button>
         )}
       </form>
+      <select
+        value={department}
+        onChange={(event) => {
+            setDepartment(event.target.value);
+            setPage(1);
+        }}
+        >
+        <option value="">
+            All Departments
+        </option>
+
+        {filterOptions.departments.map(
+            (departmentOption) => (
+            <option
+                key={departmentOption}
+                value={departmentOption}
+            >
+                {departmentOption}
+            </option>
+            )
+        )}
+        </select>
+
+        <select
+        value={country}
+        onChange={(event) => {
+            setCountry(event.target.value);
+            setPage(1);
+        }}
+        >
+        <option value="">
+            All Countries
+        </option>
+
+        {filterOptions.countries.map(
+            (countryOption) => (
+            <option
+                key={countryOption}
+                value={countryOption}
+            >
+                {countryOption}
+            </option>
+            )
+        )}
+        </select>
 
       {pagination && (
         <p>

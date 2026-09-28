@@ -237,11 +237,35 @@ const deleteEmployee = (id) => {
   return result.changes;
 };
 
+const getEmployeeFilterOptions = () => {
+  const departments = db
+    .prepare(`
+      SELECT DISTINCT department
+      FROM employees
+      ORDER BY department
+    `)
+    .all();
+
+  const countries = db
+    .prepare(`
+      SELECT DISTINCT country
+      FROM employees
+      ORDER BY country
+    `)
+    .all();
+
+  return {
+    departments,
+    countries,
+  };
+};
+
 module.exports = {
   getEmployees,
   getEmployeeCount,
   getEmployeeById,
   createEmployee,
   updateEmployee,
-  deleteEmployee
+  deleteEmployee,
+  getEmployeeFilterOptions
 };

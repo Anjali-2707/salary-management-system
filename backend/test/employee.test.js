@@ -48,6 +48,19 @@ const employeeTwo = {
   joiningDate: "2023-06-15",
 };
 
+const employeeThree = {
+  employeeId: "TEST003",
+  firstName: "John",
+  lastName: "Smith",
+  email: "john.test@acme.com",
+  department: "Engineering",
+  designation: "Software Engineer",
+  country: "United States",
+  currency: "USD",
+  annualSalary: 90000,
+  joiningDate: "2022-05-20",
+};
+
 const insertEmployee = db.prepare(`
   INSERT INTO employees (
     employee_id,
@@ -178,6 +191,59 @@ test("POST /api/employees rejects duplicate employee ID", async () => {
   assert.equal(
     response.body.error,
     "Employee ID or email already exists"
+  );
+});
+
+test("GET /api/employees/filter-options returns unique departments and countries", async () => {
+  addEmployee(employeeOne);
+  addEmployee(employeeTwo);
+  addEmployee(employeeThree);
+
+  const response = await request(app)
+    .get("/api/employees/filter-options")
+    .expect(200);
+
+  assert.deepEqual(
+    response.body.departments,
+    [
+      "Engineering",
+      "Finance",
+    ]
+  );
+
+  assert.deepEqual(
+    response.body.countries,
+    [
+      "India",
+      "United States",
+    ]
+  );
+});
+
+test("GET /api/employees applies department and country filters together", async () => {
+  addEmployee(employeeOne);
+  addEmployee(employeeTwo);
+  addEmployee(employeeThree);
+
+  const response = await request(app)
+    .get(
+      "/api/employees?department=Engineering&country=India"
+    )
+    .expect(200);
+
+  assert.equal(
+    response.body.employees.length,
+    1
+  );
+
+  assert.equal(
+    response.body.pagination.total,
+    1
+  );
+
+  assert.equal(
+    response.body.employees[0].employee_id,
+    "TEST001"
   );
 });
 
