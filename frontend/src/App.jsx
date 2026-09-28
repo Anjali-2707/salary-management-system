@@ -1,5 +1,28 @@
+import {
+  Route,
+  Routes,
+} from "react-router-dom";
+
+import AppLayout from "./components/AppLayout";
+import DashboardPage from "./pages/DashboardPage";
+import EmployeesPage from "./pages/EmployeesPage";
+
 function App() {
-  return <h1>Salary Management</h1>;
+  return (
+    <Routes>
+      <Route element={<AppLayout />}>
+        <Route
+          path="/"
+          element={<DashboardPage />}
+        />
+
+        <Route
+          path="/employees"
+          element={<EmployeesPage />}
+        />
+      </Route>
+    </Routes>
+  );
 }
 
 export default App;
