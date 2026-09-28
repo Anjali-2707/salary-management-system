@@ -17,6 +17,9 @@ function EmployeesPage() {
   const [department, setDepartment] = useState("");
     const [country, setCountry] = useState("");
 
+    const [sortBy, setSortBy] = useState("employeeId");
+    const [sortOrder, setSortOrder] = useState("asc");
+
     const [filterOptions, setFilterOptions] = useState({
     departments: [],
     countries: [],
@@ -41,6 +44,8 @@ function EmployeesPage() {
             search,
             department,
             country,
+            sortBy,
+            sortOrder,
             signal: controller.signal,
         });
 
@@ -60,7 +65,7 @@ function EmployeesPage() {
     return () => {
       controller.abort();
     };
-  }, [page, search, department, country]);
+  }, [page, search, department, country, sortBy, sortOrder]);
 
   useEffect(() => {
   const controller = new AbortController();
@@ -87,12 +92,33 @@ function EmployeesPage() {
   };
 }, []);
 
+    const handleSort = (field) => {
+  if (sortBy === field) {
+    setSortOrder((currentOrder) =>
+      currentOrder === "asc" ? "desc" : "asc"
+    );
+  } else {
+    setSortBy(field);
+    setSortOrder("asc");
+  }
+
+  setPage(1);
+};
+
   const handleSearch = (event) => {
     event.preventDefault();
 
     setPage(1);
     setSearch(searchInput.trim());
   };
+
+  const getSortIndicator = (field) => {
+  if (sortBy !== field) {
+    return "";
+  }
+
+  return sortOrder === "asc" ? " ↑" : " ↓";
+};
 
   const handleClearFilters = () => {
     setSearchInput("");
@@ -201,15 +227,62 @@ function EmployeesPage() {
         <>
           <table>
             <thead>
-              <tr>
-                <th>Employee ID</th>
-                <th>Name</th>
-                <th>Department</th>
-                <th>Designation</th>
-                <th>Country</th>
-                <th>Salary</th>
-              </tr>
-            </thead>
+  <tr>
+    <th>
+      <button
+        type="button"
+        onClick={() => handleSort("employeeId")}
+      >
+        Employee ID
+        {getSortIndicator("employeeId")}
+      </button>
+    </th>
+
+    <th>
+      <button
+        type="button"
+        onClick={() => handleSort("firstName")}
+      >
+        Name
+        {getSortIndicator("firstName")}
+      </button>
+    </th>
+
+    <th>
+      <button
+        type="button"
+        onClick={() => handleSort("department")}
+      >
+        Department
+        {getSortIndicator("department")}
+      </button>
+    </th>
+
+    <th>
+      Designation
+    </th>
+
+    <th>
+      <button
+        type="button"
+        onClick={() => handleSort("country")}
+      >
+        Country
+        {getSortIndicator("country")}
+      </button>
+    </th>
+
+    <th>
+      <button
+        type="button"
+        onClick={() => handleSort("annualSalary")}
+      >
+        Salary
+        {getSortIndicator("annualSalary")}
+      </button>
+    </th>
+  </tr>
+</thead>
 
             <tbody>
               {employees.map((employee) => (
