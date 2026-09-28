@@ -67,7 +67,30 @@ const getEmployeeFilterOptions = async ({
   return response.json();
 };
 
+const getEmployeeById = async (id, { signal } = {}) => {
+  const response = await fetch(
+    `/api/employees/${id}`,
+    {
+      signal,
+    }
+  );
+
+  if (!response.ok) {
+    const errorData = await response
+      .json()
+      .catch(() => null);
+
+    throw new Error(
+      errorData?.error ||
+        "Failed to fetch employee"
+    );
+  }
+
+  return response.json();
+};
+
 export {
   getEmployees,
   getEmployeeFilterOptions,
+  getEmployeeById
 };

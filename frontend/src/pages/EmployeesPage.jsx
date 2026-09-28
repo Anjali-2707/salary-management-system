@@ -4,6 +4,7 @@ import {
   getEmployees,
   getEmployeeFilterOptions,
 } from "../services/employeeService";
+import { Link } from "react-router-dom";
 
 function EmployeesPage() {
   const [employees, setEmployees] = useState([]);
@@ -303,6 +304,11 @@ function EmployeesPage() {
                   <td>
                     {employee.currency}{" "}
                     {employee.annual_salary.toLocaleString()}
+                  </td>
+                  <td>
+                    <Link to={`/employees/${employee.id}`}>
+                        View
+                    </Link>
                   </td>
                 </tr>
               ))}
