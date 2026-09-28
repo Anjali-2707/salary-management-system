@@ -5,19 +5,24 @@ import {
 
 import {
   Link,
+  useNavigate,
   useParams,
 } from "react-router-dom";
 
 import {
   getEmployeeById,
+  deleteEmployee
 } from "../services/employeeService";
 
 function EmployeeDetailsPage() {
   const { id } = useParams();
 
+  const navigate = useNavigate();
+
   const [employee, setEmployee] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -71,6 +76,28 @@ function EmployeeDetailsPage() {
     return <p>Employee not found.</p>;
   }
 
+  const handleDelete = async () => {
+  const confirmed = window.confirm(
+    "Are you sure you want to delete this employee?"
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    setDeleting(true);
+    setError("");
+
+    await deleteEmployee(id);
+
+    navigate("/employees");
+  } catch (error) {
+    setError(error.message);
+    setDeleting(false);
+  }
+};
+
   return (
     <div>
       <Link to="/employees">
@@ -84,7 +111,17 @@ function EmployeeDetailsPage() {
 
       <Link to={`/employees/${employee.id}/edit`}>
         Edit Employee
-        </Link>
+      </Link>
+
+      <button
+        type="button"
+        onClick={handleDelete}
+        disabled={deleting}
+        >
+        {deleting
+            ? "Deleting..."
+            : "Delete Employee"}
+      </button>
 
       <p>
         <strong>Employee ID:</strong>{" "}
