@@ -8,8 +8,12 @@ function EmployeesPage() {
   const [employees, setEmployees] = useState([]);
   const [pagination, setPagination] = useState(null);
 
+  const [page, setPage] = useState(1);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const limit = 20;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -20,8 +24,8 @@ function EmployeesPage() {
         setError("");
 
         const data = await getEmployees({
-          page: 1,
-          limit: 20,
+          page,
+          limit,
           signal: controller.signal,
         });
 
@@ -41,11 +45,15 @@ function EmployeesPage() {
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [page]);
 
-  if (loading) {
-    return <p>Loading employees...</p>;
-  }
+  const handlePreviousPage = () => {
+    setPage((currentPage) => currentPage - 1);
+  };
+
+  const handleNextPage = () => {
+    setPage((currentPage) => currentPage + 1);
+  };
 
   if (error) {
     return <p>Error: {error}</p>;
@@ -61,42 +69,76 @@ function EmployeesPage() {
         </p>
       )}
 
-      <table>
-        <thead>
-          <tr>
-            <th>Employee ID</th>
-            <th>Name</th>
-            <th>Department</th>
-            <th>Designation</th>
-            <th>Country</th>
-            <th>Salary</th>
-          </tr>
-        </thead>
+      {loading ? (
+        <p>Loading employees...</p>
+      ) : (
+        <>
+          <table>
+            <thead>
+              <tr>
+                <th>Employee ID</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Designation</th>
+                <th>Country</th>
+                <th>Salary</th>
+              </tr>
+            </thead>
 
-        <tbody>
-          {employees.map((employee) => (
-            <tr key={employee.id}>
-              <td>{employee.employee_id}</td>
+            <tbody>
+              {employees.map((employee) => (
+                <tr key={employee.id}>
+                  <td>{employee.employee_id}</td>
 
-              <td>
-                {employee.first_name}{" "}
-                {employee.last_name}
-              </td>
+                  <td>
+                    {employee.first_name}{" "}
+                    {employee.last_name}
+                  </td>
 
-              <td>{employee.department}</td>
+                  <td>{employee.department}</td>
 
-              <td>{employee.designation}</td>
+                  <td>{employee.designation}</td>
 
-              <td>{employee.country}</td>
+                  <td>{employee.country}</td>
 
-              <td>
-                {employee.currency}{" "}
-                {employee.annual_salary.toLocaleString()}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  <td>
+                    {employee.currency}{" "}
+                    {employee.annual_salary.toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {pagination && (
+            <div>
+              <button
+                type="button"
+                onClick={handlePreviousPage}
+                disabled={page === 1}
+              >
+                Previous
+              </button>
+
+              <span>
+                {" "}
+                Page {pagination.page} of{" "}
+                {pagination.totalPages}{" "}
+              </span>
+
+              <button
+                type="button"
+                onClick={handleNextPage}
+                disabled={
+                  page === pagination.totalPages
+                }
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
