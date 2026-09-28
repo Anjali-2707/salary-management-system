@@ -2,16 +2,22 @@ const {
   getEmployeeList,
 } = require("../services/employee.service");
 
+const {
+  validateEmployeeQuery,
+} = require("../validators/employee-query.validator");
+
 const getEmployees = (req, res) => {
-  const page = Number(req.query.page) || 1;
-  const limit = Number(req.query.limit) || 20;
+  const validation = validateEmployeeQuery(req.query);
 
-  const result = getEmployeeList({
-    page,
-    limit,
-  });
+  if (validation.error) {
+    return res.status(400).json({
+      error: validation.error,
+    });
+  }
 
-  res.status(200).json(result);
+  const result = getEmployeeList(validation.value);
+
+  return res.status(200).json(result);
 };
 
 module.exports = {
