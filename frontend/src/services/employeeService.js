@@ -114,9 +114,41 @@ const createEmployee = async (employee) => {
   return response.json();
 };
 
+const updateEmployee = async (
+  id,
+  employee
+) => {
+  const response = await fetch(
+    `/api/employees/${id}`,
+    {
+      method: "PUT",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify(employee),
+    }
+  );
+
+  if (!response.ok) {
+    const errorData = await response
+      .json()
+      .catch(() => null);
+
+    throw new Error(
+      errorData?.error ||
+        "Failed to update employee"
+    );
+  }
+
+  return response.json();
+};
+
 export {
   getEmployees,
   getEmployeeFilterOptions,
   getEmployeeById,
-  createEmployee
+  createEmployee,
+  updateEmployee
 };

@@ -82,6 +82,10 @@ function EmployeeDetailsPage() {
         {employee.last_name}
       </h1>
 
+      <Link to={`/employees/${employee.id}/edit`}>
+        Edit Employee
+        </Link>
+
       <p>
         <strong>Employee ID:</strong>{" "}
         {employee.employee_id}
