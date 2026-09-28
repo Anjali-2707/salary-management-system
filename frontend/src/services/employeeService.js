@@ -4,11 +4,15 @@ const getEmployees = async ({
   search = "",
   department = "",
   country = "",
+  sortBy = "employeeId",
+  sortOrder = "asc",
   signal,
 } = {}) => {
   const queryParams = new URLSearchParams({
     page: String(page),
     limit: String(limit),
+    sortBy,
+    sortOrder,
   });
 
   if (search) {
@@ -64,6 +68,6 @@ const getEmployeeFilterOptions = async ({
 };
 
 export {
-    getEmployees,
-    getEmployeeFilterOptions,
+  getEmployees,
+  getEmployeeFilterOptions,
 };
