@@ -10,6 +10,9 @@ function EmployeesPage() {
 
   const [page, setPage] = useState(1);
 
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -26,6 +29,7 @@ function EmployeesPage() {
         const data = await getEmployees({
           page,
           limit,
+          search,
           signal: controller.signal,
         });
 
@@ -45,7 +49,20 @@ function EmployeesPage() {
     return () => {
       controller.abort();
     };
-  }, [page]);
+  }, [page, search]);
+
+  const handleSearch = (event) => {
+    event.preventDefault();
+
+    setPage(1);
+    setSearch(searchInput.trim());
+  };
+
+  const handleClearSearch = () => {
+    setSearchInput("");
+    setSearch("");
+    setPage(1);
+  };
 
   const handlePreviousPage = () => {
     setPage((currentPage) => currentPage - 1);
@@ -63,6 +80,30 @@ function EmployeesPage() {
     <div>
       <h1>Employees</h1>
 
+      <form onSubmit={handleSearch}>
+        <input
+          type="text"
+          placeholder="Search by ID, name, or email"
+          value={searchInput}
+          onChange={(event) =>
+            setSearchInput(event.target.value)
+          }
+        />
+
+        <button type="submit">
+          Search
+        </button>
+
+        {search && (
+          <button
+            type="button"
+            onClick={handleClearSearch}
+          >
+            Clear
+          </button>
+        )}
+      </form>
+
       {pagination && (
         <p>
           Total Employees: {pagination.total}
@@ -71,6 +112,8 @@ function EmployeesPage() {
 
       {loading ? (
         <p>Loading employees...</p>
+      ) : employees.length === 0 ? (
+        <p>No employees found.</p>
       ) : (
         <>
           <table>
