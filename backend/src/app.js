@@ -2,6 +2,7 @@ const express = require("express");
 
 const healthRoutes = require("./routes/health.routes");
 const employeeRoutes = require("./routes/employee.routes");
+const analyticsRoutes = require("./routes/analytics.routes");
 
 const {
   notFoundHandler,
@@ -17,6 +18,7 @@ app.use(express.json());
 
 app.use("/api/health", healthRoutes);
 app.use("/api/employees", employeeRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 app.use(notFoundHandler);
 
