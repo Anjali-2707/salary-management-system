@@ -65,7 +65,9 @@ function DashboardPage() {
           setError(error.message);
         }
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
@@ -82,6 +84,10 @@ function DashboardPage() {
 
   if (error) {
     return <p>Error: {error}</p>;
+  }
+
+  if (!summary) {
+    return <p>Loading dashboard...</p>;
   }
 
   return (

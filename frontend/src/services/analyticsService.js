@@ -72,4 +72,6 @@ const getCountrySalarySummary = async ({
 
 export {
   getSalarySummary,
+  getDepartmentSalarySummary,
+  getCountrySalarySummary
 };

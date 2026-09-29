@@ -1,24 +1,100 @@
-import { Link, Outlet } from "react-router-dom";
+import {
+  AppBar,
+  Box,
+  Button,
+  Container,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+
+import {
+  Link,
+  Outlet,
+  useLocation,
+} from "react-router-dom";
 
 function AppLayout() {
+  const location = useLocation();
+
+  const isDashboard =
+    location.pathname === "/";
+
+  const isEmployees =
+    location.pathname.startsWith(
+      "/employees"
+    );
+
   return (
-    <div>
-      <header>
-        <h2>Salary Management</h2>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        backgroundColor: "background.default",
+      }}
+    >
+      <AppBar
+        position="static"
+        elevation={1}
+      >
+        <Toolbar>
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{
+              flexGrow: 1,
+              fontWeight: 700,
+            }}
+          >
+            Salary Management
+          </Typography>
 
-        <nav>
-          <Link to="/">Dashboard</Link>
+          <Button
+            component={Link}
+            to="/"
+            color="inherit"
+            variant={
+              isDashboard
+                ? "outlined"
+                : "text"
+            }
+            sx={{
+              mr: 1,
+              borderColor: isDashboard
+                ? "rgba(255,255,255,0.7)"
+                : undefined,
+            }}
+          >
+            Dashboard
+          </Button>
 
-          {" | "}
+          <Button
+            component={Link}
+            to="/employees"
+            color="inherit"
+            variant={
+              isEmployees
+                ? "outlined"
+                : "text"
+            }
+            sx={{
+              borderColor: isEmployees
+                ? "rgba(255,255,255,0.7)"
+                : undefined,
+            }}
+          >
+            Employees
+          </Button>
+        </Toolbar>
+      </AppBar>
 
-          <Link to="/employees">Employees</Link>
-        </nav>
-      </header>
-
-      <main>
+      <Container
+        maxWidth="xl"
+        sx={{
+          py: 4,
+        }}
+      >
         <Outlet />
-      </main>
-    </div>
+      </Container>
+    </Box>
   );
 }
 
