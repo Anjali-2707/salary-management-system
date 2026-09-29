@@ -4,6 +4,24 @@ import {
 } from "react";
 
 import {
+  Alert,
+  Box,
+  Card,
+  CardContent,
+  Chip,
+  CircularProgress,
+  Paper,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
+
+import {
   getSalarySummary,
   getDepartmentSalarySummary,
   getCountrySalarySummary,
@@ -78,151 +96,385 @@ function DashboardPage() {
     };
   }, []);
 
+  const formatAmount = (value) => {
+    return Number(value).toLocaleString();
+  };
+
   if (loading) {
-    return <p>Loading dashboard...</p>;
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          py: 8,
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
   }
 
   if (error) {
-    return <p>Error: {error}</p>;
+    return (
+      <Alert severity="error">
+        {error}
+      </Alert>
+    );
   }
 
   if (!summary) {
-    return <p>Loading dashboard...</p>;
+    return (
+      <Alert severity="warning">
+        Salary summary is unavailable.
+      </Alert>
+    );
   }
 
   return (
-    <div>
-      <h1>Salary Dashboard</h1>
+    <Stack spacing={4}>
+      <Box>
+        <Typography
+          variant="h1"
+          gutterBottom
+        >
+          Salary Dashboard
+        </Typography>
 
-      <p>
-        Total Employees: {summary.totalEmployees}
-      </p>
+        <Typography color="text.secondary">
+          Overview of employee compensation across
+          the organization.
+        </Typography>
+      </Box>
 
-      <h2>Salary Summary by Currency</h2>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Currency</th>
-            <th>Employees</th>
-            <th>Total Payroll</th>
-            <th>Average Salary</th>
-            <th>Minimum Salary</th>
-            <th>Maximum Salary</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {summary.salaryByCurrency.map(
-            (item) => (
-              <tr key={item.currency}>
-                <td>{item.currency}</td>
-
-                <td>
-                  {item.employeeCount}
-                </td>
-
-                <td>
-                  {item.currency}{" "}
-                  {item.totalPayroll.toLocaleString()}
-                </td>
-
-                <td>
-                  {item.currency}{" "}
-                  {item.averageSalary.toLocaleString()}
-                </td>
-
-                <td>
-                  {item.currency}{" "}
-                  {item.minimumSalary.toLocaleString()}
-                </td>
-
-                <td>
-                  {item.currency}{" "}
-                  {item.maximumSalary.toLocaleString()}
-                </td>
-              </tr>
-            )
-          )}
-        </tbody>
-      </table>
-
-      <h2>Salary by Department</h2>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Department</th>
-            <th>Currency</th>
-            <th>Employees</th>
-            <th>Total Payroll</th>
-            <th>Average Salary</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {departmentSummary.map((item) => (
-            <tr
-              key={`${item.department}-${item.currency}`}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "repeat(2, 1fr)",
+            lg: "repeat(3, 1fr)",
+          },
+          gap: 2,
+        }}
+      >
+        <Card>
+          <CardContent>
+            <Typography
+              color="text.secondary"
+              gutterBottom
             >
-              <td>{item.department}</td>
+              Total Employees
+            </Typography>
 
-              <td>{item.currency}</td>
+            <Typography variant="h4">
+              {summary.totalEmployees.toLocaleString()}
+            </Typography>
+          </CardContent>
+        </Card>
 
-              <td>{item.employeeCount}</td>
+        {summary.salaryByCurrency.map(
+          (item) => (
+            <Card key={item.currency}>
+              <CardContent>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  sx={{ mb: 1 }}
+                >
+                  <Typography
+                    color="text.secondary"
+                  >
+                    Average Salary
+                  </Typography>
 
-              <td>
-                {item.currency}{" "}
-                {item.totalPayroll.toLocaleString()}
-              </td>
+                  <Chip
+                    label={item.currency}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                  />
+                </Stack>
 
-              <td>
-                {item.currency}{" "}
-                {item.averageSalary.toLocaleString()}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                <Typography
+                  variant="h5"
+                  sx={{ mb: 1 }}
+                >
+                  {item.currency}{" "}
+                  {formatAmount(
+                    item.averageSalary
+                  )}
+                </Typography>
 
-      <h2>Salary by Country</h2>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                >
+                  {item.employeeCount.toLocaleString()}{" "}
+                  employees
+                </Typography>
+              </CardContent>
+            </Card>
+          )
+        )}
+      </Box>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Country</th>
-            <th>Currency</th>
-            <th>Employees</th>
-            <th>Total Payroll</th>
-            <th>Average Salary</th>
-          </tr>
-        </thead>
+      <Box>
+        <Typography
+          variant="h2"
+          gutterBottom
+        >
+          Salary Summary by Currency
+        </Typography>
 
-        <tbody>
-          {countrySummary.map((item) => (
-            <tr
-              key={`${item.country}-${item.currency}`}
-            >
-              <td>{item.country}</td>
+        <TableContainer
+          component={Paper}
+          variant="outlined"
+        >
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  Currency
+                </TableCell>
 
-              <td>{item.currency}</td>
+                <TableCell align="right">
+                  Employees
+                </TableCell>
 
-              <td>{item.employeeCount}</td>
+                <TableCell align="right">
+                  Total Payroll
+                </TableCell>
 
-              <td>
-                {item.currency}{" "}
-                {item.totalPayroll.toLocaleString()}
-              </td>
+                <TableCell align="right">
+                  Average
+                </TableCell>
 
-              <td>
-                {item.currency}{" "}
-                {item.averageSalary.toLocaleString()}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+                <TableCell align="right">
+                  Minimum
+                </TableCell>
+
+                <TableCell align="right">
+                  Maximum
+                </TableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {summary.salaryByCurrency.map(
+                (item) => (
+                  <TableRow
+                    key={item.currency}
+                    hover
+                  >
+                    <TableCell>
+                      <Chip
+                        label={item.currency}
+                        size="small"
+                      />
+                    </TableCell>
+
+                    <TableCell align="right">
+                      {item.employeeCount.toLocaleString()}
+                    </TableCell>
+
+                    <TableCell align="right">
+                      {item.currency}{" "}
+                      {formatAmount(
+                        item.totalPayroll
+                      )}
+                    </TableCell>
+
+                    <TableCell align="right">
+                      {item.currency}{" "}
+                      {formatAmount(
+                        item.averageSalary
+                      )}
+                    </TableCell>
+
+                    <TableCell align="right">
+                      {item.currency}{" "}
+                      {formatAmount(
+                        item.minimumSalary
+                      )}
+                    </TableCell>
+
+                    <TableCell align="right">
+                      {item.currency}{" "}
+                      {formatAmount(
+                        item.maximumSalary
+                      )}
+                    </TableCell>
+                  </TableRow>
+                )
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+
+      <Box>
+        <Typography
+          variant="h2"
+          gutterBottom
+        >
+          Salary by Department
+        </Typography>
+
+        <TableContainer
+          component={Paper}
+          variant="outlined"
+        >
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  Department
+                </TableCell>
+
+                <TableCell>
+                  Currency
+                </TableCell>
+
+                <TableCell align="right">
+                  Employees
+                </TableCell>
+
+                <TableCell align="right">
+                  Total Payroll
+                </TableCell>
+
+                <TableCell align="right">
+                  Average Salary
+                </TableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {departmentSummary.map(
+                (item) => (
+                  <TableRow
+                    key={`${item.department}-${item.currency}`}
+                    hover
+                  >
+                    <TableCell>
+                      {item.department}
+                    </TableCell>
+
+                    <TableCell>
+                      <Chip
+                        label={item.currency}
+                        size="small"
+                        variant="outlined"
+                      />
+                    </TableCell>
+
+                    <TableCell align="right">
+                      {item.employeeCount.toLocaleString()}
+                    </TableCell>
+
+                    <TableCell align="right">
+                      {item.currency}{" "}
+                      {formatAmount(
+                        item.totalPayroll
+                      )}
+                    </TableCell>
+
+                    <TableCell align="right">
+                      {item.currency}{" "}
+                      {formatAmount(
+                        item.averageSalary
+                      )}
+                    </TableCell>
+                  </TableRow>
+                )
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+
+      <Box>
+        <Typography
+          variant="h2"
+          gutterBottom
+        >
+          Salary by Country
+        </Typography>
+
+        <TableContainer
+          component={Paper}
+          variant="outlined"
+        >
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  Country
+                </TableCell>
+
+                <TableCell>
+                  Currency
+                </TableCell>
+
+                <TableCell align="right">
+                  Employees
+                </TableCell>
+
+                <TableCell align="right">
+                  Total Payroll
+                </TableCell>
+
+                <TableCell align="right">
+                  Average Salary
+                </TableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {countrySummary.map(
+                (item) => (
+                  <TableRow
+                    key={`${item.country}-${item.currency}`}
+                    hover
+                  >
+                    <TableCell>
+                      {item.country}
+                    </TableCell>
+
+                    <TableCell>
+                      <Chip
+                        label={item.currency}
+                        size="small"
+                        variant="outlined"
+                      />
+                    </TableCell>
+
+                    <TableCell align="right">
+                      {item.employeeCount.toLocaleString()}
+                    </TableCell>
+
+                    <TableCell align="right">
+                      {item.currency}{" "}
+                      {formatAmount(
+                        item.totalPayroll
+                      )}
+                    </TableCell>
+
+                    <TableCell align="right">
+                      {item.currency}{" "}
+                      {formatAmount(
+                        item.averageSalary
+                      )}
+                    </TableCell>
+                  </TableRow>
+                )
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+    </Stack>
   );
 }
 
