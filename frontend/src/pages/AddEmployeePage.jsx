@@ -1,6 +1,16 @@
 import { useState } from "react";
 
 import {
+  Alert,
+  Box,
+  Button,
+  Stack,
+  Typography,
+} from "@mui/material";
+
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+
+import {
   Link,
   useNavigate,
 } from "react-router-dom";
@@ -67,15 +77,42 @@ function AddEmployeePage() {
   };
 
   return (
-    <div>
-      <Link to="/employees">
-        ← Back to Employees
-      </Link>
+    <Stack
+      spacing={3}
+      sx={{
+        maxWidth: 1000,
+        mx: "auto",
+      }}
+    >
+      <Box>
+        <Button
+          component={Link}
+          to="/employees"
+          startIcon={<ArrowBackIcon />}
+          sx={{
+            mb: 2,
+          }}
+        >
+          Back to Employees
+        </Button>
 
-      <h1>Add Employee</h1>
+        <Typography
+          variant="h1"
+          gutterBottom
+        >
+          Add Employee
+        </Typography>
+
+        <Typography color="text.secondary">
+          Create a new employee compensation
+          record.
+        </Typography>
+      </Box>
 
       {error && (
-        <p>Error: {error}</p>
+        <Alert severity="error">
+          {error}
+        </Alert>
       )}
 
       <EmployeeForm
@@ -85,7 +122,7 @@ function AddEmployeePage() {
         saving={saving}
         submitLabel="Create Employee"
       />
-    </div>
+    </Stack>
   );
 }
 

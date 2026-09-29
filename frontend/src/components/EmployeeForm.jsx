@@ -1,3 +1,10 @@
+import {
+  Box,
+  Button,
+  Paper,
+  TextField,
+} from "@mui/material";
+
 function EmployeeForm({
   formData,
   onChange,
@@ -6,167 +13,146 @@ function EmployeeForm({
   submitLabel,
 }) {
   return (
-    <form onSubmit={onSubmit}>
-      <div>
-        <label htmlFor="employeeId">
-          Employee ID
-        </label>
-
-        <input
-          id="employeeId"
+    <Paper
+      variant="outlined"
+      sx={{
+        p: 3,
+      }}
+    >
+      <Box
+        component="form"
+        onSubmit={onSubmit}
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            md: "repeat(2, 1fr)",
+          },
+          gap: 2,
+        }}
+      >
+        <TextField
+          label="Employee ID"
           name="employeeId"
-          type="text"
           value={formData.employeeId}
           onChange={onChange}
           required
+          fullWidth
         />
-      </div>
 
-      <div>
-        <label htmlFor="firstName">
-          First Name
-        </label>
-
-        <input
-          id="firstName"
-          name="firstName"
-          type="text"
-          value={formData.firstName}
-          onChange={onChange}
-          required
-        />
-      </div>
-
-      <div>
-        <label htmlFor="lastName">
-          Last Name
-        </label>
-
-        <input
-          id="lastName"
-          name="lastName"
-          type="text"
-          value={formData.lastName}
-          onChange={onChange}
-          required
-        />
-      </div>
-
-      <div>
-        <label htmlFor="email">
-          Email
-        </label>
-
-        <input
-          id="email"
+        <TextField
+          label="Email"
           name="email"
           type="email"
           value={formData.email}
           onChange={onChange}
           required
+          fullWidth
         />
-      </div>
 
-      <div>
-        <label htmlFor="department">
-          Department
-        </label>
+        <TextField
+          label="First Name"
+          name="firstName"
+          value={formData.firstName}
+          onChange={onChange}
+          required
+          fullWidth
+        />
 
-        <input
-          id="department"
+        <TextField
+          label="Last Name"
+          name="lastName"
+          value={formData.lastName}
+          onChange={onChange}
+          required
+          fullWidth
+        />
+
+        <TextField
+          label="Department"
           name="department"
-          type="text"
           value={formData.department}
           onChange={onChange}
           required
+          fullWidth
         />
-      </div>
 
-      <div>
-        <label htmlFor="designation">
-          Designation
-        </label>
-
-        <input
-          id="designation"
+        <TextField
+          label="Designation"
           name="designation"
-          type="text"
           value={formData.designation}
           onChange={onChange}
           required
+          fullWidth
         />
-      </div>
 
-      <div>
-        <label htmlFor="country">
-          Country
-        </label>
-
-        <input
-          id="country"
+        <TextField
+          label="Country"
           name="country"
-          type="text"
           value={formData.country}
           onChange={onChange}
           required
+          fullWidth
         />
-      </div>
 
-      <div>
-        <label htmlFor="currency">
-          Currency
-        </label>
-
-        <input
-          id="currency"
+        <TextField
+          label="Currency"
           name="currency"
-          type="text"
           value={formData.currency}
           onChange={onChange}
+          placeholder="INR"
           required
+          fullWidth
         />
-      </div>
 
-      <div>
-        <label htmlFor="annualSalary">
-          Annual Salary
-        </label>
-
-        <input
-          id="annualSalary"
+        <TextField
+          label="Annual Salary"
           name="annualSalary"
           type="number"
-          min="0"
           value={formData.annualSalary}
           onChange={onChange}
+          inputProps={{
+            min: 0,
+          }}
           required
+          fullWidth
         />
-      </div>
 
-      <div>
-        <label htmlFor="joiningDate">
-          Joining Date
-        </label>
-
-        <input
-          id="joiningDate"
+        <TextField
+          label="Joining Date"
           name="joiningDate"
           type="date"
           value={formData.joiningDate}
           onChange={onChange}
+          InputLabelProps={{
+            shrink: true,
+          }}
           required
+          fullWidth
         />
-      </div>
 
-      <button
-        type="submit"
-        disabled={saving}
-      >
-        {saving
-          ? "Saving..."
-          : submitLabel}
-      </button>
-    </form>
+        <Box
+          sx={{
+            gridColumn: {
+              xs: "1",
+              md: "1 / -1",
+            },
+            display: "flex",
+            justifyContent: "flex-end",
+          }}
+        >
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={saving}
+          >
+            {saving
+              ? "Saving..."
+              : submitLabel}
+          </Button>
+        </Box>
+      </Box>
+    </Paper>
   );
 }
 

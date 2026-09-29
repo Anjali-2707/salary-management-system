@@ -4,6 +4,17 @@ import {
 } from "react";
 
 import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Stack,
+  Typography,
+} from "@mui/material";
+
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+
+import {
   Link,
   useNavigate,
   useParams,
@@ -18,7 +29,6 @@ import {
 
 function EditEmployeePage() {
   const { id } = useParams();
-
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -39,7 +49,8 @@ function EditEmployeePage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const controller = new AbortController();
+    const controller =
+      new AbortController();
 
     const loadEmployee = async () => {
       try {
@@ -71,7 +82,9 @@ function EditEmployeePage() {
           setError(error.message);
         }
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
@@ -120,19 +133,56 @@ function EditEmployeePage() {
   };
 
   if (loading) {
-    return <p>Loading employee...</p>;
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          py: 8,
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
   }
 
   return (
-    <div>
-      <Link to={`/employees/${id}`}>
-        ← Back to Employee
-      </Link>
+    <Stack
+      spacing={3}
+      sx={{
+        maxWidth: 1000,
+        mx: "auto",
+      }}
+    >
+      <Box>
+        <Button
+          component={Link}
+          to={`/employees/${id}`}
+          startIcon={<ArrowBackIcon />}
+          sx={{
+            mb: 2,
+          }}
+        >
+          Back to Employee
+        </Button>
 
-      <h1>Edit Employee</h1>
+        <Typography
+          variant="h1"
+          gutterBottom
+        >
+          Edit Employee
+        </Typography>
+
+        <Typography color="text.secondary">
+          Update employee and compensation
+          information.
+        </Typography>
+      </Box>
 
       {error && (
-        <p>Error: {error}</p>
+        <Alert severity="error">
+          {error}
+        </Alert>
       )}
 
       <EmployeeForm
@@ -142,7 +192,7 @@ function EditEmployeePage() {
         saving={saving}
         submitLabel="Save Changes"
       />
-    </div>
+    </Stack>
   );
 }
 
