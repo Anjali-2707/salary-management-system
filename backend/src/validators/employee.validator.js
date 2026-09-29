@@ -1,4 +1,33 @@
-const validateEmployee = (employee) => {
+const EMAIL_PATTERN =
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const CURRENCY_PATTERN =
+  /^[A-Za-z]{3}$/;
+
+const DATE_PATTERN =
+  /^\d{4}-\d{2}-\d{2}$/;
+
+const isValidDate = (value) => {
+  if (!DATE_PATTERN.test(value)) {
+    return false;
+  }
+
+  const [year, month, day] = value
+    .split("-")
+    .map(Number);
+
+  const date = new Date(
+    Date.UTC(year, month - 1, day)
+  );
+
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
+};
+
+const validateEmployee = (employee = {}) => {
   const {
     employeeId,
     firstName,
@@ -12,65 +41,120 @@ const validateEmployee = (employee) => {
     joiningDate,
   } = employee;
 
-  if (!employeeId?.trim()) {
+  if (
+    typeof employeeId !== "string" ||
+    !employeeId.trim()
+  ) {
     return {
       error: "employeeId is required",
     };
   }
 
-  if (!firstName?.trim()) {
+  if (
+    typeof firstName !== "string" ||
+    !firstName.trim()
+  ) {
     return {
       error: "firstName is required",
     };
   }
 
-  if (!lastName?.trim()) {
+  if (
+    typeof lastName !== "string" ||
+    !lastName.trim()
+  ) {
     return {
       error: "lastName is required",
     };
   }
 
-  if (!email?.trim()) {
+  if (
+    typeof email !== "string" ||
+    !email.trim()
+  ) {
     return {
       error: "email is required",
     };
   }
 
-  if (!department?.trim()) {
+  if (!EMAIL_PATTERN.test(email.trim())) {
+    return {
+      error: "email must be valid",
+    };
+  }
+
+  if (
+    typeof department !== "string" ||
+    !department.trim()
+  ) {
     return {
       error: "department is required",
     };
   }
 
-  if (!designation?.trim()) {
+  if (
+    typeof designation !== "string" ||
+    !designation.trim()
+  ) {
     return {
       error: "designation is required",
     };
   }
 
-  if (!country?.trim()) {
+  if (
+    typeof country !== "string" ||
+    !country.trim()
+  ) {
     return {
       error: "country is required",
     };
   }
 
-  if (!currency?.trim()) {
+  if (
+    typeof currency !== "string" ||
+    !currency.trim()
+  ) {
     return {
       error: "currency is required",
     };
   }
 
-  const salary = Number(annualSalary);
-
-  if (!Number.isFinite(salary) || salary < 0) {
+  if (
+    !CURRENCY_PATTERN.test(
+      currency.trim()
+    )
+  ) {
     return {
-      error: "annualSalary must be a non-negative number",
+      error:
+        "currency must be a 3-letter code",
     };
   }
 
-  if (!joiningDate?.trim()) {
+  const salary = Number(annualSalary);
+
+  if (
+    !Number.isFinite(salary) ||
+    salary < 0
+  ) {
+    return {
+      error:
+        "annualSalary must be a non-negative number",
+    };
+  }
+
+  if (
+    typeof joiningDate !== "string" ||
+    !joiningDate.trim()
+  ) {
     return {
       error: "joiningDate is required",
+    };
+  }
+
+  if (!isValidDate(joiningDate.trim())) {
+    return {
+      error:
+        "joiningDate must be a valid date in YYYY-MM-DD format",
     };
   }
 
@@ -83,7 +167,9 @@ const validateEmployee = (employee) => {
       department: department.trim(),
       designation: designation.trim(),
       country: country.trim(),
-      currency: currency.trim().toUpperCase(),
+      currency: currency
+        .trim()
+        .toUpperCase(),
       annualSalary: salary,
       joiningDate: joiningDate.trim(),
     },
