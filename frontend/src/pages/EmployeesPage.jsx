@@ -1,10 +1,42 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+  TextField,
+  Typography,
+} from "@mui/material";
+
+import AddIcon from "@mui/icons-material/Add";
+import ClearIcon from "@mui/icons-material/Clear";
+import SearchIcon from "@mui/icons-material/Search";
+
+import {
+  Link,
+} from "react-router-dom";
 
 import {
   getEmployees,
   getEmployeeFilterOptions,
 } from "../services/employeeService";
-import { Link } from "react-router-dom";
 
 function EmployeesPage() {
   const [employees, setEmployees] = useState([]);
@@ -12,34 +44,77 @@ function EmployeesPage() {
 
   const [page, setPage] = useState(1);
 
-  const [searchInput, setSearchInput] = useState("");
-  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] =
+    useState("");
 
-  const [department, setDepartment] = useState("");
-    const [country, setCountry] = useState("");
+  const [search, setSearch] =
+    useState("");
 
-    const [sortBy, setSortBy] = useState("employeeId");
-    const [sortOrder, setSortOrder] = useState("asc");
+  const [department, setDepartment] =
+    useState("");
 
-    const [filterOptions, setFilterOptions] = useState({
+  const [country, setCountry] =
+    useState("");
+
+  const [sortBy, setSortBy] =
+    useState("employeeId");
+
+  const [sortOrder, setSortOrder] =
+    useState("asc");
+
+  const [
+    filterOptions,
+    setFilterOptions,
+  ] = useState({
     departments: [],
     countries: [],
-    });
+  });
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
 
   const limit = 20;
 
   useEffect(() => {
-    const controller = new AbortController();
+    const controller =
+      new AbortController();
+
+    const loadFilterOptions = async () => {
+      try {
+        const data =
+          await getEmployeeFilterOptions({
+            signal: controller.signal,
+          });
+
+        setFilterOptions(data);
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          setError(error.message);
+        }
+      }
+    };
+
+    loadFilterOptions();
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
+
+  useEffect(() => {
+    const controller =
+      new AbortController();
 
     const loadEmployees = async () => {
       try {
         setLoading(true);
         setError("");
 
-        const data = await getEmployees({
+        const data =
+          await getEmployees({
             page,
             limit,
             search,
@@ -48,7 +123,7 @@ function EmployeesPage() {
             sortBy,
             sortOrder,
             signal: controller.signal,
-        });
+          });
 
         setEmployees(data.employees);
         setPagination(data.pagination);
@@ -57,7 +132,9 @@ function EmployeesPage() {
           setError(error.message);
         }
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
@@ -66,45 +143,14 @@ function EmployeesPage() {
     return () => {
       controller.abort();
     };
-  }, [page, search, department, country, sortBy, sortOrder]);
-
-  useEffect(() => {
-  const controller = new AbortController();
-
-  const loadFilterOptions = async () => {
-    try {
-      const data =
-        await getEmployeeFilterOptions({
-          signal: controller.signal,
-        });
-
-      setFilterOptions(data);
-    } catch (error) {
-      if (error.name !== "AbortError") {
-        setError(error.message);
-      }
-    }
-  };
-
-  loadFilterOptions();
-
-  return () => {
-    controller.abort();
-  };
-}, []);
-
-    const handleSort = (field) => {
-  if (sortBy === field) {
-    setSortOrder((currentOrder) =>
-      currentOrder === "asc" ? "desc" : "asc"
-    );
-  } else {
-    setSortBy(field);
-    setSortOrder("asc");
-  }
-
-  setPage(1);
-};
+  }, [
+    page,
+    search,
+    department,
+    country,
+    sortBy,
+    sortOrder,
+  ]);
 
   const handleSearch = (event) => {
     event.preventDefault();
@@ -113,241 +159,503 @@ function EmployeesPage() {
     setSearch(searchInput.trim());
   };
 
-  const getSortIndicator = (field) => {
-  if (sortBy !== field) {
-    return "";
-  }
-
-  return sortOrder === "asc" ? " ↑" : " ↓";
-};
-
   const handleClearFilters = () => {
     setSearchInput("");
     setSearch("");
     setDepartment("");
     setCountry("");
     setPage(1);
-    };
+  };
+
+  const handleSort = (field) => {
+    if (sortBy === field) {
+      setSortOrder((currentOrder) =>
+        currentOrder === "asc"
+          ? "desc"
+          : "asc"
+      );
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+
+    setPage(1);
+  };
 
   const handlePreviousPage = () => {
-    setPage((currentPage) => currentPage - 1);
+    setPage(
+      (currentPage) =>
+        currentPage - 1
+    );
   };
 
   const handleNextPage = () => {
-    setPage((currentPage) => currentPage + 1);
+    setPage(
+      (currentPage) =>
+        currentPage + 1
+    );
   };
 
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
-
   return (
-    <div>
-      <h1>Employees</h1>
-      <Link to="/employees/new">
-        Add Employee
-        </Link>
-
-      <form onSubmit={handleSearch}>
-        <input
-          type="text"
-          placeholder="Search by ID, name, or email"
-          value={searchInput}
-          onChange={(event) =>
-            setSearchInput(event.target.value)
-          }
-        />
-
-        <button type="submit">
-          Search
-        </button>
-
-        {(search || department || country) && (
-          <button
-            type="button"
-            onClick={handleClearFilters}
+    <Stack spacing={3}>
+      <Stack
+        direction={{
+          xs: "column",
+          sm: "row",
+        }}
+        justifyContent="space-between"
+        alignItems={{
+          xs: "stretch",
+          sm: "center",
+        }}
+        spacing={2}
+      >
+        <Box>
+          <Typography
+            variant="h1"
+            gutterBottom
           >
-            Clear
-          </button>
-        )}
-      </form>
-      <select
-        value={department}
-        onChange={(event) => {
-            setDepartment(event.target.value);
-            setPage(1);
-        }}
+            Employees
+          </Typography>
+
+          <Typography color="text.secondary">
+            Search, review and manage employee
+            compensation records.
+          </Typography>
+        </Box>
+
+        <Button
+          component={Link}
+          to="/employees/new"
+          variant="contained"
+          startIcon={<AddIcon />}
         >
-        <option value="">
-            All Departments
-        </option>
+          Add Employee
+        </Button>
+      </Stack>
 
-        {filterOptions.departments.map(
-            (departmentOption) => (
-            <option
-                key={departmentOption}
-                value={departmentOption}
-            >
-                {departmentOption}
-            </option>
-            )
-        )}
-        </select>
-
-        <select
-        value={country}
-        onChange={(event) => {
-            setCountry(event.target.value);
-            setPage(1);
+      <Paper
+        variant="outlined"
+        sx={{
+          p: 2,
         }}
+      >
+        <Box
+          component="form"
+          onSubmit={handleSearch}
         >
-        <option value="">
-            All Countries
-        </option>
+          <Stack
+            direction={{
+              xs: "column",
+              md: "row",
+            }}
+            spacing={2}
+          >
+            <TextField
+              label="Search employees"
+              placeholder="ID, name, or email"
+              value={searchInput}
+              onChange={(event) =>
+                setSearchInput(
+                  event.target.value
+                )
+              }
+              fullWidth
+              size="small"
+            />
 
-        {filterOptions.countries.map(
-            (countryOption) => (
-            <option
-                key={countryOption}
-                value={countryOption}
+            <FormControl
+              size="small"
+              sx={{
+                minWidth: 200,
+              }}
             >
-                {countryOption}
-            </option>
-            )
-        )}
-        </select>
+              <InputLabel>
+                Department
+              </InputLabel>
+
+              <Select
+                value={department}
+                label="Department"
+                onChange={(event) => {
+                  setDepartment(
+                    event.target.value
+                  );
+
+                  setPage(1);
+                }}
+              >
+                <MenuItem value="">
+                  All Departments
+                </MenuItem>
+
+                {filterOptions.departments.map(
+                  (departmentOption) => (
+                    <MenuItem
+                      key={departmentOption}
+                      value={departmentOption}
+                    >
+                      {departmentOption}
+                    </MenuItem>
+                  )
+                )}
+              </Select>
+            </FormControl>
+
+            <FormControl
+              size="small"
+              sx={{
+                minWidth: 190,
+              }}
+            >
+              <InputLabel>
+                Country
+              </InputLabel>
+
+              <Select
+                value={country}
+                label="Country"
+                onChange={(event) => {
+                  setCountry(
+                    event.target.value
+                  );
+
+                  setPage(1);
+                }}
+              >
+                <MenuItem value="">
+                  All Countries
+                </MenuItem>
+
+                {filterOptions.countries.map(
+                  (countryOption) => (
+                    <MenuItem
+                      key={countryOption}
+                      value={countryOption}
+                    >
+                      {countryOption}
+                    </MenuItem>
+                  )
+                )}
+              </Select>
+            </FormControl>
+
+            <Button
+              type="submit"
+              variant="contained"
+              startIcon={<SearchIcon />}
+            >
+              Search
+            </Button>
+
+            {(search ||
+              department ||
+              country) && (
+              <Button
+                type="button"
+                variant="outlined"
+                onClick={
+                  handleClearFilters
+                }
+                startIcon={<ClearIcon />}
+              >
+                Clear
+              </Button>
+            )}
+          </Stack>
+        </Box>
+      </Paper>
+
+      {error && (
+        <Alert severity="error">
+          {error}
+        </Alert>
+      )}
 
       {pagination && (
-        <p>
-          Total Employees: {pagination.total}
-        </p>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+        >
+          {pagination.total.toLocaleString()}{" "}
+          employees found
+        </Typography>
       )}
 
       {loading ? (
-        <p>Loading employees...</p>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            py: 8,
+          }}
+        >
+          <CircularProgress />
+        </Box>
       ) : employees.length === 0 ? (
-        <p>No employees found.</p>
+        <Paper
+          variant="outlined"
+          sx={{
+            p: 6,
+            textAlign: "center",
+          }}
+        >
+          <Typography variant="h6">
+            No employees found
+          </Typography>
+
+          <Typography
+            color="text.secondary"
+            sx={{
+              mt: 1,
+            }}
+          >
+            Try changing your search or
+            filters.
+          </Typography>
+        </Paper>
       ) : (
         <>
-          <table>
-            <thead>
-  <tr>
-    <th>
-      <button
-        type="button"
-        onClick={() => handleSort("employeeId")}
-      >
-        Employee ID
-        {getSortIndicator("employeeId")}
-      </button>
-    </th>
+          <TableContainer
+            component={Paper}
+            variant="outlined"
+          >
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>
+                    <TableSortLabel
+                      active={
+                        sortBy ===
+                        "employeeId"
+                      }
+                      direction={
+                        sortBy ===
+                        "employeeId"
+                          ? sortOrder
+                          : "asc"
+                      }
+                      onClick={() =>
+                        handleSort(
+                          "employeeId"
+                        )
+                      }
+                    >
+                      Employee ID
+                    </TableSortLabel>
+                  </TableCell>
 
-    <th>
-      <button
-        type="button"
-        onClick={() => handleSort("firstName")}
-      >
-        Name
-        {getSortIndicator("firstName")}
-      </button>
-    </th>
+                  <TableCell>
+                    <TableSortLabel
+                      active={
+                        sortBy ===
+                        "firstName"
+                      }
+                      direction={
+                        sortBy ===
+                        "firstName"
+                          ? sortOrder
+                          : "asc"
+                      }
+                      onClick={() =>
+                        handleSort(
+                          "firstName"
+                        )
+                      }
+                    >
+                      Name
+                    </TableSortLabel>
+                  </TableCell>
 
-    <th>
-      <button
-        type="button"
-        onClick={() => handleSort("department")}
-      >
-        Department
-        {getSortIndicator("department")}
-      </button>
-    </th>
+                  <TableCell>
+                    <TableSortLabel
+                      active={
+                        sortBy ===
+                        "department"
+                      }
+                      direction={
+                        sortBy ===
+                        "department"
+                          ? sortOrder
+                          : "asc"
+                      }
+                      onClick={() =>
+                        handleSort(
+                          "department"
+                        )
+                      }
+                    >
+                      Department
+                    </TableSortLabel>
+                  </TableCell>
 
-    <th>
-      Designation
-    </th>
+                  <TableCell>
+                    Designation
+                  </TableCell>
 
-    <th>
-      <button
-        type="button"
-        onClick={() => handleSort("country")}
-      >
-        Country
-        {getSortIndicator("country")}
-      </button>
-    </th>
+                  <TableCell>
+                    <TableSortLabel
+                      active={
+                        sortBy ===
+                        "country"
+                      }
+                      direction={
+                        sortBy ===
+                        "country"
+                          ? sortOrder
+                          : "asc"
+                      }
+                      onClick={() =>
+                        handleSort(
+                          "country"
+                        )
+                      }
+                    >
+                      Country
+                    </TableSortLabel>
+                  </TableCell>
 
-    <th>
-      <button
-        type="button"
-        onClick={() => handleSort("annualSalary")}
-      >
-        Salary
-        {getSortIndicator("annualSalary")}
-      </button>
-    </th>
-  </tr>
-</thead>
+                  <TableCell align="right">
+                    <TableSortLabel
+                      active={
+                        sortBy ===
+                        "annualSalary"
+                      }
+                      direction={
+                        sortBy ===
+                        "annualSalary"
+                          ? sortOrder
+                          : "asc"
+                      }
+                      onClick={() =>
+                        handleSort(
+                          "annualSalary"
+                        )
+                      }
+                    >
+                      Salary
+                    </TableSortLabel>
+                  </TableCell>
 
-            <tbody>
-              {employees.map((employee) => (
-                <tr key={employee.id}>
-                  <td>{employee.employee_id}</td>
+                  <TableCell align="right">
+                    Actions
+                  </TableCell>
+                </TableRow>
+              </TableHead>
 
-                  <td>
-                    {employee.first_name}{" "}
-                    {employee.last_name}
-                  </td>
+              <TableBody>
+                {employees.map(
+                  (employee) => (
+                    <TableRow
+                      key={employee.id}
+                      hover
+                    >
+                      <TableCell>
+                        {
+                          employee.employee_id
+                        }
+                      </TableCell>
 
-                  <td>{employee.department}</td>
+                      <TableCell>
+                        <Typography
+                          fontWeight={500}
+                        >
+                          {
+                            employee.first_name
+                          }{" "}
+                          {
+                            employee.last_name
+                          }
+                        </Typography>
 
-                  <td>{employee.designation}</td>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                        >
+                          {employee.email}
+                        </Typography>
+                      </TableCell>
 
-                  <td>{employee.country}</td>
+                      <TableCell>
+                        {
+                          employee.department
+                        }
+                      </TableCell>
 
-                  <td>
-                    {employee.currency}{" "}
-                    {employee.annual_salary.toLocaleString()}
-                  </td>
-                  <td>
-                    <Link to={`/employees/${employee.id}`}>
-                        View
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      <TableCell>
+                        {
+                          employee.designation
+                        }
+                      </TableCell>
+
+                      <TableCell>
+                        {employee.country}
+                      </TableCell>
+
+                      <TableCell
+                        align="right"
+                      >
+                        {employee.currency}{" "}
+                        {employee.annual_salary.toLocaleString()}
+                      </TableCell>
+
+                      <TableCell
+                        align="right"
+                      >
+                        <Button
+                          component={Link}
+                          to={`/employees/${employee.id}`}
+                          size="small"
+                        >
+                          View
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  )
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
           {pagination && (
-            <div>
-              <button
-                type="button"
-                onClick={handlePreviousPage}
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Button
+                variant="outlined"
+                onClick={
+                  handlePreviousPage
+                }
                 disabled={page === 1}
               >
                 Previous
-              </button>
+              </Button>
 
-              <span>
-                {" "}
+              <Typography
+                variant="body2"
+                color="text.secondary"
+              >
                 Page {pagination.page} of{" "}
-                {pagination.totalPages}{" "}
-              </span>
+                {pagination.totalPages}
+              </Typography>
 
-              <button
-                type="button"
+              <Button
+                variant="outlined"
                 onClick={handleNextPage}
                 disabled={
-                  page === pagination.totalPages
+                  page ===
+                  pagination.totalPages
                 }
               >
                 Next
-              </button>
-            </div>
+              </Button>
+            </Stack>
           )}
         </>
       )}
-    </div>
+    </Stack>
   );
 }
 
