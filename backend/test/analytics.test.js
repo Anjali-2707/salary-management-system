@@ -1,9 +1,13 @@
 process.env.DATABASE_PATH = "/tmp/salary-management-analytics-test.db";
+process.env.HR_EMAIL = "hr@acme.com";
+process.env.HR_PASSWORD = "test-password";
+process.env.JWT_SECRET = "test-jwt-secret";
 
 const fs = require("fs");
 
 const {
   test,
+  before,
   beforeEach,
   after,
 } = require("node:test");
@@ -22,6 +26,20 @@ const db = require("../src/database/db");
 const app = require("../src/app");
 
 initializeDatabase();
+
+let authToken;
+
+before(async () => {
+  const response = await request(app)
+    .post("/api/auth/login")
+    .send({
+      email: process.env.HR_EMAIL,
+      password: process.env.HR_PASSWORD,
+    })
+    .expect(200);
+
+  authToken = response.body.token;
+});
 
 const insertEmployee = db.prepare(`
   INSERT INTO employees (
@@ -119,6 +137,10 @@ beforeEach(() => {
 test("GET /api/analytics/summary returns salary summary by currency", async () => {
   const response = await request(app)
     .get("/api/analytics/summary")
+    .set(
+    "Authorization",
+    `Bearer ${authToken}`
+  )
     .expect(200);
 
   assert.equal(
@@ -155,6 +177,10 @@ test("GET /api/analytics/summary returns salary summary by currency", async () =
 test("GET /api/analytics/departments returns salary statistics by department and currency", async () => {
   const response = await request(app)
     .get("/api/analytics/departments")
+    .set(
+    "Authorization",
+    `Bearer ${authToken}`
+  )
     .expect(200);
 
   const engineeringInr =
@@ -204,6 +230,10 @@ test("GET /api/analytics/departments returns salary statistics by department and
 test("GET /api/analytics/countries returns salary statistics by country and currency", async () => {
   const response = await request(app)
     .get("/api/analytics/countries")
+    .set(
+    "Authorization",
+    `Bearer ${authToken}`
+  )
     .expect(200);
 
   const india =

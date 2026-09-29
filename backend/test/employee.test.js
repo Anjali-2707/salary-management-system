@@ -1,8 +1,12 @@
 process.env.DATABASE_PATH = "/tmp/salary-management-employee-test.db";
+process.env.HR_EMAIL = "hr@acme.com";
+process.env.HR_PASSWORD = "test-password";
+process.env.JWT_SECRET = "test-jwt-secret";
 
 const fs = require("fs");
 const {
   test,
+  before,
   beforeEach,
   after,
 } = require("node:test");
@@ -21,6 +25,20 @@ const db = require("../src/database/db");
 const app = require("../src/app");
 
 initializeDatabase();
+
+let authToken;
+
+before(async () => {
+  const response = await request(app)
+    .post("/api/auth/login")
+    .send({
+      email: process.env.HR_EMAIL,
+      password: process.env.HR_PASSWORD,
+    })
+    .expect(200);
+
+  authToken = response.body.token;
+});
 
 const employeeOne = {
   employeeId: "TEST001",
@@ -102,6 +120,10 @@ test("GET /api/employees returns employees", async () => {
 
   const response = await request(app)
     .get("/api/employees")
+    .set(
+    "Authorization",
+    `Bearer ${authToken}`
+  )
     .expect(200);
 
   assert.equal(response.body.employees.length, 2);
@@ -119,6 +141,10 @@ test("GET /api/employees supports pagination", async () => {
 
   const response = await request(app)
     .get("/api/employees?page=2&limit=1")
+    .set(
+    "Authorization",
+    `Bearer ${authToken}`
+  )
     .expect(200);
 
   assert.equal(response.body.employees.length, 1);
@@ -136,6 +162,10 @@ test("GET /api/employees supports pagination", async () => {
 test("GET /api/employees rejects invalid page", async () => {
   const response = await request(app)
     .get("/api/employees?page=-1")
+    .set(
+      "Authorization",
+      `Bearer ${authToken}`
+    )
     .expect(400);
 
   assert.equal(
@@ -147,6 +177,10 @@ test("GET /api/employees rejects invalid page", async () => {
 test("POST /api/employees creates an employee", async () => {
   const response = await request(app)
     .post("/api/employees")
+    .set(
+    "Authorization",
+    `Bearer ${authToken}`
+  )
     .send(employeeOne)
     .expect(201);
 
@@ -185,6 +219,10 @@ test("POST /api/employees rejects duplicate employee ID", async () => {
 
   const response = await request(app)
     .post("/api/employees")
+    .set(
+    "Authorization",
+    `Bearer ${authToken}`
+  )
     .send(duplicateEmployee)
     .expect(409);
 
@@ -201,6 +239,10 @@ test("GET /api/employees/filter-options returns unique departments and countries
 
   const response = await request(app)
     .get("/api/employees/filter-options")
+    .set(
+    "Authorization",
+    `Bearer ${authToken}`
+  )
     .expect(200);
 
   assert.deepEqual(
@@ -229,6 +271,10 @@ test("GET /api/employees applies department and country filters together", async
     .get(
       "/api/employees?department=Engineering&country=India"
     )
+    .set(
+    "Authorization",
+    `Bearer ${authToken}`
+  )
     .expect(200);
 
   assert.equal(
