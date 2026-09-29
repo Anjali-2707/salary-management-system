@@ -4,25 +4,49 @@ import {
 } from "react";
 
 import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Divider,
+  Paper,
+  Stack,
+  Typography,
+} from "@mui/material";
+
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+
+import {
   Link,
   useNavigate,
   useParams,
 } from "react-router-dom";
 
 import {
+  deleteEmployee,
   getEmployeeById,
-  deleteEmployee
 } from "../services/employeeService";
 
 function EmployeeDetailsPage() {
   const { id } = useParams();
-
   const navigate = useNavigate();
 
   const [employee, setEmployee] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState("");
+
+  const [
+    deleteDialogOpen,
+    setDeleteDialogOpen,
+  ] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -45,7 +69,9 @@ function EmployeeDetailsPage() {
           setError(error.message);
         }
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
@@ -56,114 +82,327 @@ function EmployeeDetailsPage() {
     };
   }, [id]);
 
+  const handleDelete = async () => {
+    try {
+      setDeleting(true);
+      setError("");
+
+      await deleteEmployee(id);
+
+      navigate("/employees");
+    } catch (error) {
+      setError(error.message);
+      setDeleting(false);
+      setDeleteDialogOpen(false);
+    }
+  };
+
   if (loading) {
-    return <p>Loading employee...</p>;
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          py: 8,
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
   }
 
-  if (error) {
+  if (error && !employee) {
     return (
-      <div>
-        <p>Error: {error}</p>
+      <Stack spacing={2}>
+        <Alert severity="error">
+          {error}
+        </Alert>
 
-        <Link to="/employees">
-          Back to Employees
-        </Link>
-      </div>
+        <Box>
+          <Button
+            component={Link}
+            to="/employees"
+            startIcon={<ArrowBackIcon />}
+          >
+            Back to Employees
+          </Button>
+        </Box>
+      </Stack>
     );
   }
 
   if (!employee) {
-    return <p>Employee not found.</p>;
+    return (
+      <Alert severity="warning">
+        Employee not found.
+      </Alert>
+    );
   }
-
-  const handleDelete = async () => {
-  const confirmed = window.confirm(
-    "Are you sure you want to delete this employee?"
-  );
-
-  if (!confirmed) {
-    return;
-  }
-
-  try {
-    setDeleting(true);
-    setError("");
-
-    await deleteEmployee(id);
-
-    navigate("/employees");
-  } catch (error) {
-    setError(error.message);
-    setDeleting(false);
-  }
-};
 
   return (
-    <div>
-      <Link to="/employees">
-        ← Back to Employees
-      </Link>
+    <>
+      <Stack
+        spacing={3}
+        sx={{
+          maxWidth: 900,
+          mx: "auto",
+        }}
+      >
+        <Box>
+          <Button
+            component={Link}
+            to="/employees"
+            startIcon={<ArrowBackIcon />}
+            sx={{
+              mb: 2,
+            }}
+          >
+            Back to Employees
+          </Button>
 
-      <h1>
-        {employee.first_name}{" "}
-        {employee.last_name}
-      </h1>
+          <Stack
+            direction={{
+              xs: "column",
+              sm: "row",
+            }}
+            justifyContent="space-between"
+            alignItems={{
+              xs: "stretch",
+              sm: "center",
+            }}
+            spacing={2}
+          >
+            <Box>
+              <Typography
+                variant="h1"
+                gutterBottom
+              >
+                {employee.first_name}{" "}
+                {employee.last_name}
+              </Typography>
 
-      <Link to={`/employees/${employee.id}/edit`}>
-        Edit Employee
-      </Link>
+              <Typography color="text.secondary">
+                {employee.employee_id}
+              </Typography>
+            </Box>
 
-      <button
-        type="button"
-        onClick={handleDelete}
-        disabled={deleting}
+            <Stack
+              direction="row"
+              spacing={1}
+            >
+              <Button
+                component={Link}
+                to={`/employees/${employee.id}/edit`}
+                variant="contained"
+                startIcon={<EditIcon />}
+              >
+                Edit
+              </Button>
+
+              <Button
+                type="button"
+                variant="outlined"
+                color="error"
+                startIcon={<DeleteIcon />}
+                onClick={() =>
+                  setDeleteDialogOpen(true)
+                }
+              >
+                Delete
+              </Button>
+            </Stack>
+          </Stack>
+        </Box>
+
+        {error && (
+          <Alert severity="error">
+            {error}
+          </Alert>
+        )}
+
+        <Paper
+          variant="outlined"
+          sx={{
+            p: 3,
+          }}
         >
-        {deleting
-            ? "Deleting..."
-            : "Delete Employee"}
-      </button>
+          <Typography
+            variant="h2"
+            sx={{
+              mb: 2,
+            }}
+          >
+            Employee Information
+          </Typography>
 
-      <p>
-        <strong>Employee ID:</strong>{" "}
-        {employee.employee_id}
-      </p>
+          <Divider sx={{ mb: 3 }} />
 
-      <p>
-        <strong>Email:</strong>{" "}
-        {employee.email}
-      </p>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "repeat(2, 1fr)",
+              },
+              gap: 3,
+            }}
+          >
+            <Box>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+              >
+                Employee ID
+              </Typography>
 
-      <p>
-        <strong>Department:</strong>{" "}
-        {employee.department}
-      </p>
+              <Typography>
+                {employee.employee_id}
+              </Typography>
+            </Box>
 
-      <p>
-        <strong>Designation:</strong>{" "}
-        {employee.designation}
-      </p>
+            <Box>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+              >
+                Email
+              </Typography>
 
-      <p>
-        <strong>Country:</strong>{" "}
-        {employee.country}
-      </p>
+              <Typography>
+                {employee.email}
+              </Typography>
+            </Box>
 
-      <p>
-        <strong>Currency:</strong>{" "}
-        {employee.currency}
-      </p>
+            <Box>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+              >
+                Department
+              </Typography>
 
-      <p>
-        <strong>Annual Salary:</strong>{" "}
-        {employee.currency}{" "}
-        {employee.annual_salary.toLocaleString()}
-      </p>
+              <Typography>
+                {employee.department}
+              </Typography>
+            </Box>
 
-      <p>
-        <strong>Joining Date:</strong>{" "}
-        {employee.joining_date}
-      </p>
-    </div>
+            <Box>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+              >
+                Designation
+              </Typography>
+
+              <Typography>
+                {employee.designation}
+              </Typography>
+            </Box>
+
+            <Box>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+              >
+                Country
+              </Typography>
+
+              <Typography>
+                {employee.country}
+              </Typography>
+            </Box>
+
+            <Box>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+              >
+                Joining Date
+              </Typography>
+
+              <Typography>
+                {employee.joining_date}
+              </Typography>
+            </Box>
+
+            <Box>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+              >
+                Currency
+              </Typography>
+
+              <Typography>
+                {employee.currency}
+              </Typography>
+            </Box>
+
+            <Box>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+              >
+                Annual Salary
+              </Typography>
+
+              <Typography
+                sx={{
+                  fontWeight: 600,
+                }}
+              >
+                {employee.currency}{" "}
+                {employee.annual_salary.toLocaleString()}
+              </Typography>
+            </Box>
+          </Box>
+        </Paper>
+      </Stack>
+
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => {
+          if (!deleting) {
+            setDeleteDialogOpen(false);
+          }
+        }}
+      >
+        <DialogTitle>
+          Delete employee?
+        </DialogTitle>
+
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete{" "}
+            {employee.first_name}{" "}
+            {employee.last_name}?
+            This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+
+        <DialogActions>
+          <Button
+            onClick={() =>
+              setDeleteDialogOpen(false)
+            }
+            disabled={deleting}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            color="error"
+            variant="contained"
+            onClick={handleDelete}
+            disabled={deleting}
+          >
+            {deleting
+              ? "Deleting..."
+              : "Delete Employee"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }
 
