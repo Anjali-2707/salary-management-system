@@ -137,7 +137,7 @@ function EditEmployeePage() {
       <Box
         sx={{
           display: "flex",
-          justifyContent: "center",
+          justifycontent: "center",
           py: 8,
         }}
       >

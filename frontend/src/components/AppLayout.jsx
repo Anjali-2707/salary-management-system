@@ -13,6 +13,16 @@ import {
   useLocation,
 } from "react-router-dom";
 
+import LogoutIcon from "@mui/icons-material/Logout";
+
+import {
+  useNavigate,
+} from "react-router-dom";
+
+import {
+  useAuth,
+} from "../context/AuthContext";
+
 function AppLayout() {
   const location = useLocation();
 
@@ -23,6 +33,21 @@ function AppLayout() {
     location.pathname.startsWith(
       "/employees"
     );
+
+  const navigate = useNavigate();
+
+  const {
+    user,
+    logout,
+  } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+
+    navigate("/login", {
+      replace: true,
+    });
+  };
 
   return (
     <Box
@@ -82,6 +107,26 @@ function AppLayout() {
             }}
           >
             Employees
+          </Button>
+          <Typography
+            variant="body2"
+            sx={{
+              mx: 2,
+              display: {
+                xs: "none",
+                md: "block",
+              },
+            }}
+          >
+            {user?.name}
+          </Typography>
+
+          <Button
+            color="inherit"
+            startIcon={<LogoutIcon />}
+            onClick={handleLogout}
+          >
+            Logout
           </Button>
         </Toolbar>
       </AppBar>

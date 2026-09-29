@@ -111,7 +111,7 @@ function EmployeeForm({
           type="number"
           value={formData.annualSalary}
           onChange={onChange}
-          inputProps={{
+          inputprops={{
             min: 0,
           }}
           required
@@ -124,7 +124,7 @@ function EmployeeForm({
           type="date"
           value={formData.joiningDate}
           onChange={onChange}
-          InputLabelProps={{
+          inputlabelprops={{
             shrink: true,
           }}
           required
@@ -138,7 +138,7 @@ function EmployeeForm({
               md: "1 / -1",
             },
             display: "flex",
-            justifyContent: "flex-end",
+            justifycontent: "flex-end",
           }}
         >
           <Button

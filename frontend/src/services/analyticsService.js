@@ -1,7 +1,10 @@
+import {
+  apiFetch,
+} from "./apiClient";
 const getSalarySummary = async ({
   signal,
 } = {}) => {
-  const response = await fetch(
+  const response = await apiFetch(
     "/api/analytics/summary",
     {
       signal,
@@ -25,7 +28,7 @@ const getSalarySummary = async ({
 const getDepartmentSalarySummary = async ({
   signal,
 } = {}) => {
-  const response = await fetch(
+  const response = await apiFetch(
     "/api/analytics/departments",
     {
       signal,
@@ -49,7 +52,7 @@ const getDepartmentSalarySummary = async ({
 const getCountrySalarySummary = async ({
   signal,
 } = {}) => {
-  const response = await fetch(
+  const response = await apiFetch(
     "/api/analytics/countries",
     {
       signal,

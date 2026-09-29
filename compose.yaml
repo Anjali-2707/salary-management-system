@@ -30,6 +30,9 @@ services:
     environment:
       NODE_ENV: development
       DATABASE_PATH: /app/data/salary-management.db
+      HR_EMAIL: hr@acme.com
+      HR_PASSWORD: demo123
+      JWT_SECRET: local-development-secret-change-me
 
 
 volumes:

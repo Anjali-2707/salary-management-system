@@ -203,8 +203,8 @@ function EmployeesPage() {
           xs: "column",
           sm: "row",
         }}
-        justifyContent="space-between"
-        alignItems={{
+        justifycontent="space-between"
+        alignitems={{
           xs: "stretch",
           sm: "center",
         }}
@@ -386,7 +386,7 @@ function EmployeesPage() {
         <Box
           sx={{
             display: "flex",
-            justifyContent: "center",
+            justifycontent: "center",
             py: 8,
           }}
         >
@@ -397,7 +397,7 @@ function EmployeesPage() {
           variant="outlined"
           sx={{
             p: 6,
-            textAlign: "center",
+            textalign: "center",
           }}
         >
           <Typography variant="h6">
@@ -620,8 +620,8 @@ function EmployeesPage() {
           {pagination && (
             <Stack
               direction="row"
-              justifyContent="space-between"
-              alignItems="center"
+              justifycontent="space-between"
+              alignitems="center"
             >
               <Button
                 variant="outlined"

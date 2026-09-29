@@ -1,3 +1,6 @@
+import {
+  apiFetch,
+} from "./apiClient";
 const getEmployees = async ({
   page = 1,
   limit = 20,
@@ -27,7 +30,7 @@ const getEmployees = async ({
     queryParams.set("country", country);
   }
 
-  const response = await fetch(
+  const response = await apiFetch(
     `/api/employees?${queryParams.toString()}`,
     {
       signal,
@@ -51,7 +54,7 @@ const getEmployees = async ({
 const getEmployeeFilterOptions = async ({
   signal,
 } = {}) => {
-  const response = await fetch(
+  const response = await apiFetch(
     "/api/employees/filter-options",
     {
       signal,
@@ -68,7 +71,7 @@ const getEmployeeFilterOptions = async ({
 };
 
 const getEmployeeById = async (id, { signal } = {}) => {
-  const response = await fetch(
+  const response = await apiFetch(
     `/api/employees/${id}`,
     {
       signal,
@@ -90,7 +93,7 @@ const getEmployeeById = async (id, { signal } = {}) => {
 };
 
 const createEmployee = async (employee) => {
-  const response = await fetch("/api/employees", {
+  const response = await apiFetch("/api/employees", {
     method: "POST",
 
     headers: {
@@ -118,7 +121,7 @@ const updateEmployee = async (
   id,
   employee
 ) => {
-  const response = await fetch(
+  const response = await apiFetch(
     `/api/employees/${id}`,
     {
       method: "PUT",
@@ -146,7 +149,7 @@ const updateEmployee = async (
 };
 
 const deleteEmployee = async (id) => {
-  const response = await fetch(
+  const response = await apiFetch(
     `/api/employees/${id}`,
     {
       method: "DELETE",

@@ -102,7 +102,7 @@ function EmployeeDetailsPage() {
       <Box
         sx={{
           display: "flex",
-          justifyContent: "center",
+          justifycontent: "center",
           py: 8,
         }}
       >
@@ -165,8 +165,8 @@ function EmployeeDetailsPage() {
               xs: "column",
               sm: "row",
             }}
-            justifyContent="space-between"
-            alignItems={{
+            justifycontent="space-between"
+            alignitems={{
               xs: "stretch",
               sm: "center",
             }}

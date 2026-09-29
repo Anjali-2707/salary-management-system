@@ -105,7 +105,7 @@ function DashboardPage() {
       <Box
         sx={{
           display: "flex",
-          justifyContent: "center",
+          justifycontent: "center",
           py: 8,
         }}
       >
@@ -178,8 +178,8 @@ function DashboardPage() {
               <CardContent>
                 <Stack
                   direction="row"
-                  justifyContent="space-between"
-                  alignItems="center"
+                  justifycontent="space-between"
+                  alignitems="center"
                   sx={{ mb: 1 }}
                 >
                   <Typography
