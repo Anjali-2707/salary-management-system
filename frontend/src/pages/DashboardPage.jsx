@@ -5,26 +5,61 @@ import {
 
 import {
   getSalarySummary,
+  getDepartmentSalarySummary,
+  getCountrySalarySummary,
 } from "../services/analyticsService";
 
 function DashboardPage() {
   const [summary, setSummary] = useState(null);
+
+  const [
+    departmentSummary,
+    setDepartmentSummary,
+  ] = useState([]);
+
+  const [
+    countrySummary,
+    setCountrySummary,
+  ] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     const controller = new AbortController();
 
-    const loadSummary = async () => {
+    const loadDashboard = async () => {
       try {
         setLoading(true);
         setError("");
 
-        const data = await getSalarySummary({
-          signal: controller.signal,
-        });
+        const [
+          summaryData,
+          departmentData,
+          countryData,
+        ] = await Promise.all([
+          getSalarySummary({
+            signal: controller.signal,
+          }),
 
-        setSummary(data);
+          getDepartmentSalarySummary({
+            signal: controller.signal,
+          }),
+
+          getCountrySalarySummary({
+            signal: controller.signal,
+          }),
+        ]);
+
+        setSummary(summaryData);
+
+        setDepartmentSummary(
+          departmentData.departments
+        );
+
+        setCountrySummary(
+          countryData.countries
+        );
       } catch (error) {
         if (error.name !== "AbortError") {
           setError(error.message);
@@ -34,7 +69,7 @@ function DashboardPage() {
       }
     };
 
-    loadSummary();
+    loadDashboard();
 
     return () => {
       controller.abort();
@@ -103,6 +138,82 @@ function DashboardPage() {
               </tr>
             )
           )}
+        </tbody>
+      </table>
+
+      <h2>Salary by Department</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Department</th>
+            <th>Currency</th>
+            <th>Employees</th>
+            <th>Total Payroll</th>
+            <th>Average Salary</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {departmentSummary.map((item) => (
+            <tr
+              key={`${item.department}-${item.currency}`}
+            >
+              <td>{item.department}</td>
+
+              <td>{item.currency}</td>
+
+              <td>{item.employeeCount}</td>
+
+              <td>
+                {item.currency}{" "}
+                {item.totalPayroll.toLocaleString()}
+              </td>
+
+              <td>
+                {item.currency}{" "}
+                {item.averageSalary.toLocaleString()}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <h2>Salary by Country</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Country</th>
+            <th>Currency</th>
+            <th>Employees</th>
+            <th>Total Payroll</th>
+            <th>Average Salary</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {countrySummary.map((item) => (
+            <tr
+              key={`${item.country}-${item.currency}`}
+            >
+              <td>{item.country}</td>
+
+              <td>{item.currency}</td>
+
+              <td>{item.employeeCount}</td>
+
+              <td>
+                {item.currency}{" "}
+                {item.totalPayroll.toLocaleString()}
+              </td>
+
+              <td>
+                {item.currency}{" "}
+                {item.averageSalary.toLocaleString()}
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
